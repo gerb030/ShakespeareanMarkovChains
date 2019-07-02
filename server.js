@@ -20,6 +20,7 @@ fs.readFile("cleaned/shakespeare.txt", "utf8", function (err, text) {
  * Server listener
  */
 http.createServer(function (req, res) {
+  res.writeHead(200, { 'Content-Type': 'application/json' });
   var queryString = req.url.substr(req.url.indexOf("?")+1);
   var commands = getCommands(queryString);
   if (commands['precedingWord'] == "") {
