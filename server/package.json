@@ -1,0 +1,27 @@
+{
+  "name": "textanalyser",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gerb030/TextAnalyser.git"
+  },
+  "author": "gerb",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gerb030/TextAnalyser/issues"
+  },
+  "homepage": "https://github.com/gerb030/TextAnalyser#readme",
+  "dependencies": {
+    "csv-parse": "^4.4.3",
+    "rhyme": "0.0.3",
+    "rhyme-plus": "0.0.7",
+    "rita": "^1.3.94",
+    "save": "^2.4.0",
+    "twit": "^2.2.11"
+  }
+}
