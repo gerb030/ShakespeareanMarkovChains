@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Shakespearean Autocorrect</title>
+  <base href="/">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link href="https://fonts.googleapis.com/css?family=DM+Serif+Text&display=swap" rel="stylesheet">
+</head>
+<body onload="init();">
+  <form>
+  <script>
+function init() {
+  document.getElementById("input").focus();
+}
+
+function onKeystroke(e, obj) {
+  var lastString = "";
+  var threeMatches = ["...", "...", "..."];
+  switch(e.keyCode) {
+    case 32:
+    case 13:
+    case 188:
+    case 16:
+    case 91:
+    case 186:
+    case 190:
+    case 189:
+    case 49:
+      // whole word entered
+      break;
+    default:
+      lastStrings = getLastwords();
+      var threeMatches = getMatches(lastStrings[0], lastStrings[1]);
+      break;
+  }
+}
+
+function fillMatches(threeMatches) {
+  document.getElementById("suggestionMiddle").innerText = threeMatches[0];
+  document.getElementById("suggestionLeft").innerText = threeMatches[1];
+  document.getElementById("suggestionRight").innerText = threeMatches[2];
+
+}
+
+function getLastwords() {
+  var inputText = document.getElementById("input").value;
+  var segments = inputText.split(/\s+/);
+  return [segments[segments.length-1], segments[segments.length-2]];
+}
+
+function getMatches(lastString, precedingWord) {
+  var xmlhttp = new XMLHttpRequest();
+  var url = "https://www.gerb.nl/autocomplete-api/?precedingWord="+precedingWord+"&context="+lastString;
+
+  xmlhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+          var myArr = JSON.parse(this.responseText);
+          fillMatches(myArr);
+      }
+  };
+  xmlhttp.open("GET", url, true);
+  xmlhttp.send();
+
+  return ['wonderful', 'drunk', 'sometimes'];
+}
+
+function clickHint(fieldNum) {
+  var value = "";
+  switch(fieldNum) {
+    case 1:
+      value = document.getElementById("suggestionLeft").innerText;
+      break;
+    case 2:
+      value = document.getElementById("suggestionMiddle").innerText;
+      break;
+    case 3:
+      value = document.getElementById("suggestionRight").innerText;
+      break;
+  }
+  if (value == "...") {
+    return;
+  }
+  var inputText = document.getElementById("input").value;
+  var lastChar = inputText.charAt(inputText.length-1);
+  if (lastChar.match(/\W/)) {
+    // finished word mode
+    document.getElementById("input").value += value+" ";
+  } else {
+    // type mode
+    var segments = inputText.split(/\s+/);
+    var output = "";
+    for(var i=0;i<segments.length-1;i++) {
+      output += segments[i]+" ";
+    }
+    output += value+" ";
+    document.getElementById("input").value = output;
+  }
+  document.getElementById("input").focus();
+
+}
+
+  </script>
+  <style>
+  body {
+    font-family: 'DM Serif Text', serif;
+    background-color: rgba(17, 17, 17, 1);
+    color: rgba(255, 255, 255, 1);
+    text-align: center;
+  }
+  h1, h2 {
+    color:  rgba(255, 255, 255, 1);
+    letter-spacing: 3px;
+  }
+  p {
+    color: rgba(229, 219, 186, 1);
+  }
+  #container {
+    width: 90%;
+    position: relative;
+    left: 5%;
+  }
+  #input {
+    background-color: rgba(17, 17, 17, 1);
+    width:100%;
+    font-family: 'DM Serif Text', serif;
+    color: rgba(186, 186, 186, 1);
+    font-size: 22pt;
+    border: 0px;
+    resize: none;
+  }
+  #input:focus {
+    outline: none !important;
+    border: 0px;
+  }
+  .button { 
+    font-size: 22px;
+    width: 32%;
+    height: 36px;
+    vertical-align: middle;
+    background-color: rgba(0, 38, 73, 1);
+    border: 1px solid  rgba(186, 186, 186, 1);
+    float:left; 
+    margin-left:1%; 
+    cursor: pointer;
+  }
+
+ /*
+$color2: rgba(229, 219, 186, 1);
+$color4: rgba(0, 38, 73, 1);
+*/
+</style>
+
+<div id="container">
+    <h1>Shakespearean Autocorrect</h1>
+      <p>Write like Shakespeare. <br/> Using Markov chains based on selected works by Shakespeare, <br/> autocorrect your text to sound Shakespearean.</p>
+    <textarea id="input" cols=40 rows=8 onkeyup="onKeystroke(event, this)"></textarea>
+  <div id="suggestionLeft" class="button" onclick="clickHint(1);">...</div> 
+  <div id="suggestionMiddle" class="button" onclick="clickHint(2);">...</div> 
+  <div id="suggestionRight" class="button" onclick="clickHint(3);">...</div>
+</div>
+</form>
+</body>
+</html>

@@ -11,3 +11,6 @@ This app requires a bunch of NPM modules:
 ## Execute
 
 `node index.js`
+
+## Run client
+Point your browser to `http://localhost:9003/`

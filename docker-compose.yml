@@ -1,0 +1,9 @@
+version: '3'
+services:
+  autocorrect2:
+    build: .
+    ports:
+     - "9003:80"
+    volumes:
+     - ./client/autocorrect_js:/var/www/html
+     - ./nginx-dev:/etc/nginx/sites-enabled/
