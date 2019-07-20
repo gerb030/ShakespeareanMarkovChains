@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Shakespearean Autocorrect</title>
+  <title>Shakespearean Autocorrect [BETA]</title>
   <base href="/">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -17,8 +17,6 @@ function init() {
 }
 
 function onKeystroke(e, obj) {
-  var lastString = "";
-  var threeMatches = ["...", "...", "..."];
   switch(e.keyCode) {
     case 32:
     case 13:
@@ -32,17 +30,54 @@ function onKeystroke(e, obj) {
       // whole word entered
       break;
     default:
-      lastStrings = getLastwords();
-      var threeMatches = getMatches(lastStrings[0], lastStrings[1]);
+      handleTextChange();
       break;
   }
 }
 
-function fillMatches(threeMatches) {
-  document.getElementById("suggestionMiddle").innerText = threeMatches[0];
-  document.getElementById("suggestionLeft").innerText = threeMatches[1];
-  document.getElementById("suggestionRight").innerText = threeMatches[2];
+function handleTextChange() {
+  lastStrings = getLastwords();
+  processMatches(lastStrings[0], lastStrings[1]);
+}
 
+function fillMatches(allMatches) {
+  var choices = ["...", "...", "...", "...", "..."];
+
+  switch (allMatches.length) {
+    case 0:
+      break;
+    case 1:
+      choices[2] = allMatches[0];
+      break;
+    case 2:
+      choices[2] = allMatches[0];
+      choices[3] = allMatches[1];
+      break;
+    case 3:
+      choices[2] = allMatches[1];
+      choices[3] = allMatches[0];
+      choices[4] = allMatches[2];
+      break;
+    case 4:
+      choices[1] = allMatches[1];
+      choices[2] = allMatches[2];
+      choices[3] = allMatches[0];
+      choices[4] = allMatches[3];
+      break;
+    case 5:
+    default:
+      choices[0] = allMatches[1];
+      choices[1] = allMatches[2];
+      choices[2] = allMatches[0];
+      choices[3] = allMatches[3];
+      choices[4] = allMatches[4];
+      break;
+  }
+  document.getElementById("suggestionFarLeft").innerText = choices[0];
+  document.getElementById("suggestionLeft").innerText = choices[1];
+  document.getElementById("suggestionMiddle").innerText = choices[2];
+  document.getElementById("suggestionRight").innerText = choices[3];
+  document.getElementById("suggestionFarRight").innerText = choices[4];
 }
 
 function getLastwords() {
@@ -51,10 +86,9 @@ function getLastwords() {
   return [segments[segments.length-1], segments[segments.length-2]];
 }
 
-function getMatches(lastString, precedingWord) {
+function processMatches(lastString, precedingWord) {
   var xmlhttp = new XMLHttpRequest();
-  var url = "https://www.gerb.nl/autocomplete-api/?precedingWord="+precedingWord+"&context="+lastString;
-
+  var url = "/autocomplete-api/?precedingWord="+(precedingWord==undefined ? "" : precedingWord)+"&context="+(lastString==undefined ? "" : lastString);
   xmlhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
           var myArr = JSON.parse(this.responseText);
@@ -63,13 +97,14 @@ function getMatches(lastString, precedingWord) {
   };
   xmlhttp.open("GET", url, true);
   xmlhttp.send();
-
-  return ['wonderful', 'drunk', 'sometimes'];
 }
 
 function clickHint(fieldNum) {
   var value = "";
   switch(fieldNum) {
+    case 0:
+      value = document.getElementById("suggestionFarLeft").innerText;
+      break;
     case 1:
       value = document.getElementById("suggestionLeft").innerText;
       break;
@@ -78,6 +113,9 @@ function clickHint(fieldNum) {
       break;
     case 3:
       value = document.getElementById("suggestionRight").innerText;
+      break;
+    case 4:
+      value = document.getElementById("suggestionFarRight").innerText;
       break;
   }
   if (value == "...") {
@@ -99,7 +137,7 @@ function clickHint(fieldNum) {
     document.getElementById("input").value = output;
   }
   document.getElementById("input").focus();
-
+  handleTextChange();
 }
 
   </script>
@@ -137,13 +175,13 @@ function clickHint(fieldNum) {
   }
   .button { 
     font-size: 22px;
-    width: 32%;
+    width: 19%;
     height: 36px;
     vertical-align: middle;
     background-color: rgba(0, 38, 73, 1);
     border: 1px solid  rgba(186, 186, 186, 1);
     float:left; 
-    margin-left:1%; 
+    margin-left:0.5%; 
     cursor: pointer;
   }
 
@@ -155,11 +193,13 @@ $color4: rgba(0, 38, 73, 1);
 
 <div id="container">
     <h1>Shakespearean Autocorrect</h1>
-      <p>Write like Shakespeare. <br/> Using Markov chains based on selected works by Shakespeare, <br/> autocorrect your text to sound Shakespearean.</p>
-    <textarea id="input" cols=40 rows=8 onkeyup="onKeystroke(event, this)"></textarea>
-  <div id="suggestionLeft" class="button" onclick="clickHint(1);">...</div> 
-  <div id="suggestionMiddle" class="button" onclick="clickHint(2);">...</div> 
-  <div id="suggestionRight" class="button" onclick="clickHint(3);">...</div>
+      <p>Write like Shakespeare - Beta release. <br/> Using Markov chains based on selected works by Shakespeare, <br/> autocorrect your text to sound Shakespearean.</p>
+    <textarea id="input" cols=40 rows=4 onkeyup="onKeystroke(event, this)"></textarea>
+    <div id="suggestionFarLeft" class="button" onclick="clickHint(0);">...</div> 
+    <div id="suggestionLeft" class="button" onclick="clickHint(1);">...</div> 
+    <div id="suggestionMiddle" class="button" onclick="clickHint(2);">...</div> 
+    <div id="suggestionRight" class="button" onclick="clickHint(3);">...</div>
+    <div id="suggestionFarRight" class="button" onclick="clickHint(4);">...</div>
 </div>
 </form>
 </body>
