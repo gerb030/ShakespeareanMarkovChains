@@ -16,6 +16,7 @@ fs.readFile("cleaned/shakespeare.txt", "utf8", function (err, text) {
         throw err;
     }
     markov.loadText(text);
+    console.log(markov.generateSentence());
 });
 /**
  * Server listener
