@@ -34,7 +34,7 @@ http.createServer(function (req, res) {
   res.writeHead(200, { 'Content-Type': 'application/json' });
   var queryString = req.url.substr(req.url.indexOf("?")+1);
   var commands = getCommands(queryString);
-  error_log("Request: " + commands.toString());
+  error_log("Request: " + JSON.stringify(commands));
   if (commands['context'] == "" && commands['precedingWord'] == "") {
     error_log("Empty request, returning empty array.");
     res.write("[]");
@@ -86,8 +86,9 @@ function getCommands(queryString) {
 function getMatchingWords(markov, precedingWord, context, amount) {
     // let's remove non-word characters at the end or the start of the word
     if (precedingWord.match(/^\W\w/) || precedingWord.match(/\w\W$/)) {
-        precedingWord = precedingWord.replace(/\W/, "");
+       // precedingWord = precedingWord.replace(/\W/, "");
     }
+    error_log(precedingWord);
     probabilities = markov.getProbabilities(precedingWord);
     probabilities = sort(probabilities);
     filteredWords = filterOnWordStart(probabilities, context);
@@ -153,6 +154,7 @@ function sort(input) {
 function error_log(logmsg) {
     if (VERBOSE_LOGGING) {
         var d = new Date();
-        console.log(d + " - " + logmsg);
+        var dateStr = d.getFullYear()+"-"+(d.getMonth()<10 ? "0" : "")+d.getMonth()+"-"+(d.getDay()<10 ? "0" : "")+d.getDay()+" "+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds()+"."+d.getMilliseconds();
+        console.log(dateStr + " - " + logmsg);
     }
 } 
