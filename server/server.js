@@ -34,13 +34,17 @@ http.createServer(function (req, res) {
   res.writeHead(200, { 'Content-Type': 'application/json' });
   var queryString = req.url.substr(req.url.indexOf("?")+1);
   var commands = getCommands(queryString);
+  error_log("Request: " + commands.toString());
   if (commands['context'] == "" && commands['precedingWord'] == "") {
+    error_log("Empty request, returning empty array.");
     res.write("[]");
   } else if (commands['precedingWord'] == "") { // in case of a new sentence, just give a random option
     response = [getSentenceStart(1)];
+    error_log("Response: " + JSON.stringify(response))
     res.write(JSON.stringify(response)); //write a response to the client
   } else {
     response = getMatchingWords(markov, commands['precedingWord'], commands['context'], 30);
+    error_log("Response: " + JSON.stringify(response))
     res.write(JSON.stringify(response)); //write a response to the client
   }
   res.end(); //end the response
