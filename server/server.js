@@ -6,6 +6,12 @@
  * precedingWord    @String     the word to be matched with
  * context          @String     start of the word
  */
+console.log("----------------------------------------------------------");
+console.log("----------  Shakespearean  Markov Chain service ----------");
+console.log("----------------------------------------------------------");
+console.log("");
+var PORT = 8099;
+var VERBOSE_LOGGING = true;
 var http = require('http');
 var fs = require('fs');
 var rita = require('rita');
@@ -16,7 +22,10 @@ fs.readFile("cleaned/shakespeare.txt", "utf8", function (err, text) {
         throw err;
     }
     markov.loadText(text);
-    console.log(markov.generateSentence());
+    console.log("✓ Markov chains active");
+    console.log("Your sample sentence: " + markov.generateSentence());
+    console.log("");
+    console.log("----------------------------------------------------------");
 });
 /**
  * Server listener
@@ -35,7 +44,8 @@ http.createServer(function (req, res) {
     res.write(JSON.stringify(response)); //write a response to the client
   }
   res.end(); //end the response
-}).listen(8099); //the server object listens on port 8080
+}).listen(PORT); //the server object listens on port 8080
+console.log("✓ Server started successfully, listening at port " + PORT);
 
 /**
  * Will return the acceptable commands for this service
@@ -135,3 +145,10 @@ function sort(input) {
     }
     return sorted;
 }
+
+function error_log(logmsg) {
+    if (VERBOSE_LOGGING) {
+        var d = new Date();
+        console.log(d + " - " + logmsg);
+    }
+} 
