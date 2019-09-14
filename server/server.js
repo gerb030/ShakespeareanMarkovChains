@@ -11,7 +11,7 @@ console.log("----------  Shakespearean  Markov Chain service ----------");
 console.log("----------------------------------------------------------");
 console.log("");
 var PORT = 8099;
-var VERBOSE_LOGGING = true;
+var VERBOSE_LOGGING = false;
 var http = require('http');
 var fs = require('fs');
 var rita = require('rita');
@@ -85,13 +85,14 @@ function getCommands(queryString) {
  */
 function getMatchingWords(markov, precedingWord, context, amount) {
     // let's remove non-word characters at the end or the start of the word
-    if (precedingWord.match(/^\W\w/) || precedingWord.match(/\w\W$/)) {
-       // precedingWord = precedingWord.replace(/\W/, "");
-    }
-    error_log(precedingWord);
+    error_log("1 "+ precedingWord);
+    precedingWord = precedingWord.replace(/[<>{}/\[\]]+/g, "");
+    error_log("2 " + precedingWord);
     probabilities = markov.getProbabilities(precedingWord);
+    error_log(JSON.stringify(probabilities));
     probabilities = sort(probabilities);
     filteredWords = filterOnWordStart(probabilities, context);
+    error_log(JSON.stringify(filteredWords));
     return filteredWords.splice(0, amount);
 }
 
@@ -111,18 +112,14 @@ function getSentenceStart(numberOfWords) {
 function filterOnWordStart(list, context) {
     var output = [];
     for(var n=0;n<list.length;n++) {
-        if (list[n][0].match(/\w+/)) { // only use word characters
-            if (context == list[n][0].substr(0, context.length)) {
-                output.push(list[n][0]);
-            }
+        if (context == list[n][0].substr(0, context.length)) {
+            output.push(list[n][0]);
         }
     }
     // in case no matches were found, just show the raw Markov chain results
     if (output.length == 0) {	
         for(var n=0;n<list.length;n++) {
-            if (list[n][0].match(/\w+/)) { // only use word characters
-                output.push(list[n][0]);
-            }
+            output.push(list[n][0]);
     	}
     }
     return output;
